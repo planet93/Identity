@@ -1,6 +1,7 @@
 ﻿using Users.Models;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity;
 
 namespace Users.Infrastructure
 {
@@ -27,7 +28,31 @@ namespace Users.Infrastructure
         }
         public void PerformInitialSetup(AppIdentityDbContext contex)
         {
-            //настройка конфигурации контекста будут указываться здесь
+            AppUserManager userMgr = new AppUserManager(new UserStore<AppUser>(contex));
+            AppRoleManager roleMgr = new AppRoleManager(new RoleStore<AppRole>(contex));
+
+            string roleName = "Administrators";
+            string userName = "Admin";
+            string password = "123";
+            string email = "admin@mail.ru";
+
+            if (!roleMgr.RoleExists(roleName))
+            {
+                roleMgr.Create(new AppRole(roleName));
+            }
+
+            AppUser user = userMgr.FindByName(userName);
+            if (user == null)
+            {
+                userMgr.Create(new AppUser { UserName = userName, Email = email },
+                    password);
+                user = userMgr.FindByName(userName);
+            }
+
+            if (!userMgr.IsInRole(user.Id, roleName))
+            {
+                userMgr.AddToRole(user.Id, roleName);
+            }
         }
     }
 }

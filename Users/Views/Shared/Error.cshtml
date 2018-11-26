@@ -1,14 +1,27 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="width=device-width" />
-    <title>Ошибка</title>
-</head>
-<body>
-    <hgroup>
-        <h1>Ошибка.</h1>
-        <h2>При обработке запроса произошла ошибка.</h2>
-    </hgroup>
-</body>
-</html>
+﻿@model IEnumerable<string>
+
+@{ 
+    ViewBag.Title = "Ошибка";
+}
+
+<div class="alert alert-danger">
+    @switch (Model.Count())
+    {
+        case 0:
+            @: Что-то пошло не так. Пожалуйста, попробуйте еще раз!
+            break;
+        case 1:
+            @Model.First();
+            break;
+        default:
+            @: Следующие ошибки были обнаружены:
+            <ul>
+                @foreach (string error in Model)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+            break;
+    }
+</div>
+@Html.ActionLink("OK","Index", null, new { @class = "btn btn-default"})

@@ -9,7 +9,7 @@ namespace Users.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(Users.Infrastructure.AppIdentityDbContext context)

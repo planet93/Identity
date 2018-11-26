@@ -12,6 +12,7 @@ namespace Users.App_Start
         public void Configuration(IAppBuilder app)
         {
             app.CreatePerOwinContext<AppIdentityDbContext>(AppIdentityDbContext.Create);
+            app.CreatePerOwinContext<AppRoleManager>(AppRoleManager.Create);
             app.CreatePerOwinContext<AppUserManager>(AppUserManager.Create);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {

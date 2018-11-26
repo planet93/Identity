@@ -18,6 +18,18 @@ namespace Users.Infrastructure
         {
             AppIdentityDbContext db = context.Get<AppIdentityDbContext>();
             AppUserManager manager = new AppUserManager(new UserStore<AppUser>(db));
+
+            manager.PasswordValidator = new CustomPasswordValidator
+            {
+                RequiredLength = 3,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false
+            };
+            manager.UserValidator = new CustomUserValidator();
+
+
             return manager;
         }
     }
