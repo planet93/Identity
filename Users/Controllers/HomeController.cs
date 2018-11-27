@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Users.Infrastructure;
+using Users.Models;
+using System.Data.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNet.Identity.Owin;
+using System.Threading.Tasks;
 
 namespace Users.Controllers
 {
@@ -11,6 +20,7 @@ namespace Users.Controllers
         [Authorize]
         public ActionResult Index()
         {
+            
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("Ключ", "Значение");
 
@@ -33,6 +43,48 @@ namespace Users.Controllers
             dict.Add("В роли Users?", HttpContext.User.IsInRole("Users"));
 
             return dict;
+        }
+
+        [Authorize]
+        public ActionResult UserProps()
+        {
+            return View(CurrentUser);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> UserProps(Cities city)
+        {
+            AppUser user = CurrentUser;
+            user.City = city;
+
+            user.SetCountryFromCity(city);
+
+            await UserManagerCont.UpdateAsync(user);
+            return View(user);
+        }
+
+        private AppUser CurrentUser
+        {
+            get { return UserManagerCont.FindByName(HttpContext.User.Identity.Name); }
+        }
+
+        private AppUserManager UserManagerCont
+        {
+            get { return HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+        }
+
+        [NonAction]
+        public static string GetCityName<TEnum>(TEnum item) where TEnum: struct, IConvertible
+        {
+            if (!typeof(TEnum).IsEnum)
+            {
+                throw new ArgumentException("Тип перечисления должен быть перечислением");
+            }
+            else
+            {
+                return item.GetType().GetMember(item.ToString()).First().GetCustomAttribute<DisplayAttribute>().Name;
+            }
         }
     }
 }

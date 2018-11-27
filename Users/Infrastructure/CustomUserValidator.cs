@@ -7,16 +7,15 @@ using System.Text.RegularExpressions;
 
 namespace Users.Infrastructure
 {
-    public class CustomUserValidator:IIdentityValidator<AppUser>
+    public class CustomUserValidator: IIdentityValidator<AppUser>
     {
-
         public async Task<IdentityResult> ValidateAsync(AppUser item)
         {
             List<string> errors = new List<string>();
-            if (!item.Email.ToLower().EndsWith("@mail.ru"))
-            {
-                errors.Add("Адрес должен быть @mail.ru");
-            }
+            //if (!item.Email.ToLower().EndsWith("@mail.ru"))
+            //{
+            //    errors.Add("Адрес должен быть @mail.ru");
+            //}
             if (string.IsNullOrEmpty(item.UserName.Trim()))
             {
                 errors.Add("Вы указали пустое имя");

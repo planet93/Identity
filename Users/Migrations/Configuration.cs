@@ -1,9 +1,13 @@
 namespace Users.Migrations
 {
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using Users.Infrastructure;
+    using Users.Models;
 
     internal sealed class Configuration : DbMigrationsConfiguration<Users.Infrastructure.AppIdentityDbContext>
     {
@@ -14,18 +18,37 @@ namespace Users.Migrations
 
         protected override void Seed(Users.Infrastructure.AppIdentityDbContext context)
         {
-            //  This method will be called after migrating to the latest version.
+            AppUserManager userMgr = new AppUserManager(new UserStore<AppUser>(context));
+            AppRoleManager roleMgr = new AppRoleManager(new RoleStore<AppRole>(context));
 
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data. E.g.
-            //
-            //    context.People.AddOrUpdate(
-            //      p => p.FullName,
-            //      new Person { FullName = "Andrew Peters" },
-            //      new Person { FullName = "Brice Lambson" },
-            //      new Person { FullName = "Rowan Miller" }
-            //    );
-            //
+            string roleName = "Administrators";
+            string userName = "Admin225";
+            string password = "123";
+            string email = "admin@main.ru";
+
+            if (!roleMgr.RoleExists(roleName))
+            {
+                roleMgr.Create(new AppRole(roleName));
+            }
+
+            AppUser user = userMgr.FindByName(userName);
+            if (user == null)
+            {
+                userMgr.Create(new AppUser { UserName = userName, Email = email },
+                    password);
+                user = userMgr.FindByName(userName);
+            }
+
+            foreach (AppUser dbUser in userMgr.Users)
+            {
+                if(dbUser.Country == Countries.NONE)
+                {
+                    dbUser.SetCountryFromCity(dbUser.City);
+                }
+            }
+
+
+            context.SaveChanges();
         }
     }
 }
